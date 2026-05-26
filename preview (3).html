@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Trắc Nghiệm Đạo Hàm Hàm Ẩn</title>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+<script id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f3f7fc;
+    margin:0;
+    padding:0;
+    color:#222;
+}
+
+header{
+    background:linear-gradient(135deg,#0057b8,#0088ff);
+    color:white;
+    padding:30px;
+    text-align:center;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.score-box{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.progress{
+    width:100%;
+    height:25px;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(to right,#00b894,#00cec9);
+    transition:0.4s;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:25px;
+    border-radius:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+
+.question h3{
+    color:#0057b8;
+}
+
+.option{
+    padding:14px;
+    margin:10px 0;
+    border:2px solid #ccc;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.option:hover{
+    background:#eef6ff;
+}
+
+.correct{
+    background:#c8ffd2 !important;
+    border-color:green !important;
+}
+
+.wrong{
+    background:#ffd0d0 !important;
+    border-color:red !important;
+}
+
+.explanation{
+    margin-top:15px;
+    padding:15px;
+    border-left:5px solid #0057b8;
+    background:#eef5ff;
+    display:none;
+    border-radius:10px;
+}
+
+.tip{
+    background:#fff6c9;
+    padding:10px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+button{
+    background:#0057b8;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#003f88;
+}
+
+footer{
+    text-align:center;
+    padding:30px;
+    color:#555;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>ĐỀ THI TRẮC NGHIỆM ĐẠO HÀM HÀM ẨN</h1>
+<p>20 câu hỏi tương tác - MathJax - Giải thích chi tiết</p>
+</header>
+
+<div class="container">
+
+<div class="score-box">
+<h2>Điểm số: <span id="score">0</span>/20</h2>
+
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+</div>
+
+<div id="quiz"></div>
+
+<div style="text-align:center;margin:30px;">
+<button onclick="resetQuiz()">Làm lại đề</button>
+</div>
+
+</div>
+
+<footer>
+© Implicit Differentiation Quiz - Dr.rer.nat Duymt
+</footer>
+
+<script>
+
+const questions = [
+
+{
+question:"Hàm nào sau đây là hàm ẩn?",
+options:[
+"\\( y = 2x+1 \\)",
+"\\( y = x^2 \\)",
+"\\( x^2+y^2=1 \\)",
+"\\( y=\\sin x \\)"
+],
+answer:2,
+explanation:`
+Hàm ẩn là hàm mà \\(x\\) và \\(y\\) lẫn với nhau.
+
+Ở đây:
+
+\\[
+x^2+y^2=1
+\\]
+
+không tách được ngay thành:
+
+\\[
+y=f(x)
+\\]
+
+nên đây là hàm ẩn.
+`,
+tip:"Mẹo nhanh: thấy x và y nằm chung nhiều vế → thường là hàm ẩn."
+},
+
+{
+question:"Bước đầu tiên khi tính đạo hàm hàm ẩn là gì?",
+options:[
+"Nhóm \\(y'\\)",
+"Đạo hàm hai vế",
+"Rút y",
+"Thế số"
+],
+answer:1,
+explanation:`
+Quy trình chuẩn:
+
+1. Đạo hàm hai vế theo \\(x\\)
+
+2. Gom các số hạng chứa \\(y'\\)
+
+3. Giải tìm \\(y'\\)
+`,
+tip:"Nhớ câu thần chú: Đạo hàm hai vế → nhóm y'."
+},
+
+{
+question:"\\(\\frac{d}{dx}(y^2)=?\\)",
+options:[
+"\\(2y\\)",
+"\\(2yy'\\)",
+"\\(y^2\\)",
+"\\(2x\\)"
+],
+answer:1,
+explanation:`
+Do \\(y\\) là hàm theo \\(x\\).
+
+Áp dụng quy tắc chuỗi:
+
+\\[
+\\frac{d}{dx}(y^2)=2y\\cdot y'
+\\]
+`,
+tip:"Hễ đạo hàm dính y → nhớ nhân thêm y'."
+},
+
+{
+question:"Tính đạo hàm của \\(xy\\)",
+options:[
+"\\(x+y\\)",
+"\\(xy'\\)",
+"\\(y+xy'\\)",
+"\\(x+y'\\)"
+],
+answer:2,
+explanation:`
+Dùng quy tắc tích:
+
+\\[
+(xy)'=x'y+xy'
+\\]
+
+mà:
+
+\\[
+x'=1
+\\]
+
+nên:
+
+\\[
+(xy)'=y+xy'
+\\]
+`,
+tip:"Đạo hàm tích: đạo hàm trước giữ sau + trước giữ đạo hàm sau."
+},
+
+{
+question:"Đạo hàm của \\(x^2+y^2=1\\) là:",
+options:[
+"\\(y'=\\frac{x}{y}\\)",
+"\\(y'=-\\frac{x}{y}\\)",
+"\\(y'=-\\frac{y}{x}\\)",
+"\\(y'=\\frac{y}{x}\\)"
+],
+answer:1,
+explanation:`
+Đạo hàm hai vế:
+
+\\[
+2x+2yy'=0
+\\]
+
+Chuyển vế:
+
+\\[
+2yy'=-2x
+\\]
+
+Chia \\(2y\\):
+
+\\[
+y'=-\\frac{x}{y}
+\\]
+`,
+tip:"Đường tròn luôn ra dạng âm."
+}
+
+];
+
+for(let i=6;i<=20;i++){
+
+questions.push({
+question:`Câu bài tập số ${i}: Tính đạo hàm của
+
+\\[
+x^2+xy+y^2=${i}
+\\]
+`,
+options:[
+"\\(y'=-\\frac{2x+y}{x+2y}\\)",
+"\\(y'=\\frac{2x+y}{x+2y}\\)",
+"\\(y'=-\\frac{x+2y}{2x+y}\\)",
+"\\(y'=x+y\\)"
+],
+answer:0,
+explanation:`
+Ta đạo hàm hai vế:
+
+\\[
+2x+(xy)'+2yy'=0
+\\]
+
+Đạo hàm tích:
+
+\\[
+(xy)'=y+xy'
+\\]
+
+Suy ra:
+
+\\[
+2x+y+xy'+2yy'=0
+\\]
+
+Nhóm \\(y'\\):
+
+\\[
+y'(x+2y)=-(2x+y)
+\\]
+
+Vậy:
+
+\\[
+y'=-\\frac{2x+y}{x+2y}
+\\]
+`,
+tip:"Mẹo nhanh: nhóm toàn bộ y' rồi đặt nhân tử chung."
+});
+
+}
+
+const quiz=document.getElementById("quiz");
+
+let score=0;
+let answered=0;
+
+questions.forEach((q,index)=>{
+
+const div=document.createElement("div");
+div.className="question";
+
+let html=`
+<h3>Câu ${index+1}</h3>
+<p>${q.question}</p>
+`;
+
+q.options.forEach((opt,i)=>{
+
+html+=`
+<div class="option"
+onclick="checkAnswer(this,${i},${q.answer},${index})">
+
+${opt}
+
+</div>
+`;
+
+});
+
+html+=`
+<div class="explanation" id="exp${index}">
+<h4>Giải thích chi tiết:</h4>
+${q.explanation}
+
+<div class="tip">
+💡 <b>Mẹo nhanh:</b> ${q.tip}
+</div>
+</div>
+`;
+
+div.innerHTML=html;
+quiz.appendChild(div);
+
+});
+
+function checkAnswer(element,selected,correct,index){
+
+const parent=element.parentElement;
+
+if(parent.classList.contains("done")) return;
+
+parent.classList.add("done");
+
+const options=parent.querySelectorAll(".option");
+
+options.forEach((op,i)=>{
+
+if(i===correct){
+op.classList.add("correct");
+}
+
+});
+
+if(selected!==correct){
+
+element.classList.add("wrong");
+
+}else{
+score++;
+document.getElementById("score").innerText=score;
+}
+
+answered++;
+
+document.getElementById(`exp${index}`).style.display="block";
+
+document.getElementById("progressBar").style.width=
+(answered/questions.length*100)+"%";
+
+MathJax.typeset();
+
+}
+
+function resetQuiz(){
+location.reload();
+}
+
+</script>
+
+</body>
+</html>
